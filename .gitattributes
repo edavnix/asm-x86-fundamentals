@@ -1,0 +1,21 @@
+# Gitattributes for asm-x86-fundamentals
+# Documentation: https://git-scm.com/docs/gitattributes
+
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Assembly
+*.asm text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+# Configuration
+.editorconfig text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+Justfile text eol=lf
+
+# Binary: do not modify
+*.o binary
+*.out binary

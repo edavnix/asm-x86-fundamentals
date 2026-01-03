@@ -22,7 +22,6 @@ section .data
   len_mul         equ $ - msg_mul
   msg_div         db "Division = "
   len_div         equ $ - msg_div
-
   msg_div_zero    db "Error: Division by zero", 0xA
   len_div_zero    equ $ - msg_div_zero
 
@@ -34,6 +33,7 @@ section .bss
 
 section .text
   global _start
+  default rel                   ; position-independent code
 
 print_str:
   push rax
@@ -45,74 +45,48 @@ print_str:
   pop rax
   ret
 
-print_newline:
-  push rsi
-  push rdx
-  mov rsi, newline
-  mov rdx, len_nl
-  call print_str
-  pop rdx
-  pop rsi
-  ret
-
 number_to_string:
   push rbx
   push rcx
-  push rdi
-
-  mov rbx, buffer + 19
+  lea rbx, [buffer + 19]        ; point to the end of the buffer
   mov byte [rbx], 0             ; null terminator
-  dec rbx
-
+  xor rcx, rcx                  ; sign flag
   test rax, rax
-  jnz .not_zero
-  mov byte [rbx], '0'
-  dec rbx
-  jmp .done
+  jns .is_positive              ; jump if non-negative (SF=0)
+  neg rax                       ; make rax positive
+  inc rcx                       ; set sign flag
 
-.not_zero:
-  cmp rax, 0
-  jge .positive
-  neg rax                       ; convert to positive
-  mov rcx, 1                    ; flag: it's negative
-  jmp .convert
-
-.positive:
-  mov rcx, 0                    ; flag: positive
-
-.convert:
+.is_positive:
   mov rdi, 10
 
 .divide_loop:
-  xor rdx, rdx
-  div rdi
-  add dl, '0'
-  mov [rbx], dl
   dec rbx
+  xor rdx, rdx
+  div rdi                       ; unsigned divide rax by 10
+  add dl, '0'                   ; convert remainder to ASCII
+  mov [rbx], dl
   test rax, rax
   jnz .divide_loop
-
-  cmp rcx, 1
-  jne .done
-  mov byte [rbx], '-'
+  test rcx, rcx                 ; was it negative?
+  jz .done
   dec rbx
+  mov byte [rbx], '-'           ; add negative sign
 
 .done:
-  inc rbx
   mov rsi, rbx
   lea rdx, [buffer + 19]
   sub rdx, rbx
-
-  pop rdi
   pop rcx
   pop rbx
   ret
 
 print_result:
-  call print_str                ; prints the message (e.g., Addition = )
-  call number_to_string         ; converts rax → rsi/rdx
-  call print_str                ; prints the number
-  call print_newline
+  call print_str                ; print message (rsi/rdx already set)
+  call number_to_string         ; convert rax to string (updates rsi/rdx)
+  call print_str                ; print number
+  lea rsi, [newline]            ; print newline
+  mov rdx, len_nl
+  call print_str
   ret
 
 _start:
@@ -120,46 +94,43 @@ _start:
   movsx r9, word [operand2]     ; load operand2 with sign
 
   ; Addition
-  mov rax, r8
-  add rax, r9
-  mov rsi, msg_add
+  lea rsi, [msg_add]
   mov rdx, len_add
+  mov rax, r8                   ; load first operand
+  add rax, r9                   ; perform addition
   call print_result
 
   ; Subtraction
+  lea rsi, [msg_sub]
+  mov rdx, len_sub
   mov rax, r8
   sub rax, r9
-  mov rsi, msg_sub
-  mov rdx, len_sub
   call print_result
 
   ; Multiplication
+  lea rsi, [msg_mul]
+  mov rdx, len_mul
   mov rax, r8
   imul rax, r9
-  mov rsi, msg_mul
-  mov rdx, len_mul
   call print_result
 
   ; Division
   cmp r9, 0
   je .division_by_zero
-
-  mov rax, r8
-  cqo
-  idiv r9
-  mov rsi, msg_div
-  mov rdx, len_div
-  call print_result
-  jmp .end_division
+  mov rax, r8                   ; load operand1 into rax
+  cqo                           ; sign-extend rax into rdx:rax
+  idiv r9                       ; divide by r9 (result in rax)
+  lea rsi, [msg_div]            ; load division message
+  mov rdx, len_div              ; load message length
+  call print_result             ; print message and rax
+  jmp .exit
 
 .division_by_zero:
-  mov rsi, msg_div_zero
+  lea rsi, [msg_div_zero]
   mov rdx, len_div_zero
   call print_str
-  call print_newline
-  jmp .end_division
 
-.end_division:
+.exit:
   mov rax, 60                   ; sys_exit
   xor rdi, rdi                  ; status = 0
   syscall

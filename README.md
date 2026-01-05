@@ -64,11 +64,12 @@ This repository contains programming exercises in **x86-64 Assembly** using **NA
    ```
 6. **Navigate to the exercises directory** (adjust path as needed):
    ```bash
-   cd asm-x86-fundamentals/exercises
+   cd asm-x86-fundamentals
    ```
-7. **Execute exercises**:
+7. **Execute exercises** use make run followed by the path to the file:
    ```bash
-   make run 01_arithmetic_operations
+   make help                                              # view available commands
+   make run file=exercises/01_arithmetic_operations.asm   # practical example
    ```
 
 ### 🌐 OneCompiler (No Installation Required)

@@ -19,10 +19,10 @@ CYAN      = \033[0;36m
 NC        = \033[0m
 
 # Status Prefixes
-ERROR   = $(RED)[ ERROR ]$(NC)
-INFO    = $(YELLOW)[ INFO  ]$(NC)
-SUCCESS = $(GREEN)[SUCCESS]$(NC)
-EXEC = $(CYAN)[ EXEC  ]$(NC)
+ERROR     = $(RED)[ ERROR ]$(NC)
+INFO      = $(YELLOW)[ INFO  ]$(NC)
+SUCCESS   = $(GREEN)[SUCCESS]$(NC)
+EXEC      = $(CYAN)[ EXEC  ]$(NC)
 
 .PHONY: run help
 

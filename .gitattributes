@@ -4,18 +4,18 @@
 # Auto detect text files and perform LF normalization
 * text=auto eol=lf
 
-# Assembly files: always use LF
+# Assembly
 *.asm text eol=lf
 
-# Markdown files: always use LF
+# Markdown
 *.md text eol=lf
 
-# Configuration files: always use LF
+# Configuration
 .editorconfig text eol=lf
 .gitignore text eol=lf
 .gitattributes text eol=lf
 
-# Binary files: do not modify
+# Binary: do not modify
 *.o binary
 *.out binary
 *.exe binary

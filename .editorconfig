@@ -12,7 +12,7 @@ indent_style = space
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Assembly files
+# Assembly
 [*.asm]
 max_line_length = 100
 
@@ -21,7 +21,7 @@ max_line_length = 100
 indent_size = 2
 indent_style = tab
 
-# Markdown files
+# Markdown
 [*.md]
 max_line_length = off
 trim_trailing_whitespace = false
